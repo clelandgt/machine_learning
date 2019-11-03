@@ -2,15 +2,15 @@
 # @File  : features.py
 # @Author: clelandgt@163.com
 # @Date  : 2019-11-03
-# @Desc  : 鸢尾花
-
+# @Desc  : day1学习代码
 import jieba
+import pandas as pd
 
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.preprocessing import MinMaxScaler
 
 
 def datasets_demo():
@@ -145,6 +145,24 @@ def cut_word(text):
     return ' '.join(jieba.cut(text))
 
 
+def minmax_demo():
+    """
+    归一化
+    :return:
+    """
+    # 1. 获取数据
+    df = pd.read_csv('statics/dating.txt')
+    df = df[['milage', 'Liters', 'Consumtime']]
+    print(df)
+
+    # 2. 实例化转换器
+    transform = MinMaxScaler()
+
+    # 3. 调用fit_transform
+    result = transform.fit_transform(df)
+    print('result: \n', result)
+
+
 def main():
     """
     主函数
@@ -166,7 +184,11 @@ def main():
     # chinese_text_extract_with_jieba_demo()
 
     # tfidf
-    chinese_text_extract_tfidf_demo()
+    # chinese_text_extract_tfidf_demo()
+
+    # 归一化处理
+    minmax_demo()
+
 
 
 if __name__ == '__main__':
