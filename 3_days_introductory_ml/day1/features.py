@@ -10,7 +10,10 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.decomposition import PCA
+from scipy.stats import pearsonr
 
 
 def datasets_demo():
@@ -163,32 +166,108 @@ def minmax_demo():
     print('result: \n', result)
 
 
+def standard_scaler_demo():
+    """
+    标准化
+    :return:
+    """
+    # 1. 获取数据
+    df = pd.read_csv('statics/dating.txt')
+    df = df[['milage', 'Liters', 'Consumtime']]
+    print(df)
+
+    # 2. 实例化转换器
+    transform = StandardScaler()
+
+    # 3. 调用fit_transform
+    result = transform.fit_transform(df)
+    print('result: \n', result)
+
+
+def variance_demo():
+    """
+    低方差维度过滤
+    :return:
+    """
+    # 1. 获取数据
+    data = pd.read_csv('statics/factor_returns.csv')
+    data = data.iloc[:, 1:-2]
+    print("data: \n", data)
+
+    # 2. 实例化转化器, 过滤方差小于10的数据
+    transform = VarianceThreshold(10)
+
+    # 3. 调用fit_transform
+    result = transform.fit_transform(data)
+    print("result: \n", result)
+    print("before variance features num: \n", data.shape[1])
+    print("after variance features num: \n", result.shape[1])
+
+
+def pearsonr_demo():
+    """
+    皮尔逊相关系数
+    :return:
+    """
+    data = pd.read_csv('statics/factor_returns.csv')
+    data = data.iloc[:, 1:-2]
+
+    r = pearsonr(data['revenue'], data['total_expense'])
+    print(u"revenue与total_expense之间的相关系数: ", r)
+
+
+def pca_demo():
+    """
+    pca降维
+    :return:
+    """
+    data = [[2, 8, 4, 5], [6, 3, 0, 8], [5, 4, 9, 1]]
+
+    # 1. 实例化一个转化器类, 由四维降成二维
+    transform = PCA(n_components=2)
+
+    # 2. 调用fit_transform
+    data_new = transform.fit_transform(data)
+    print('data_new: \n', data_new)
+
+
 def main():
     """
     主函数
     :return:
     """
-    # 数据集使用
+    # 代码1: 数据集使用
     # datasets_demo()
 
-    # 字典特征提取
+    # 代码2: 字典特征提取
     # dict_feature_extract_demo()
 
-    # 英文特征提取
+    # 代码3: 英文特征提取
     # text_feature_extract_demo()
 
-    # 中文特征提取(手动分词)
+    # 代码4: 中文特征提取(手动分词)
     # chinese_text_feature_extract_demo()
 
-    # 中文特征提取(自动分词)
+    # 代码5: 中文特征提取(自动分词)
     # chinese_text_extract_with_jieba_demo()
 
-    # tfidf
+    # 代码6: tfidf
     # chinese_text_extract_tfidf_demo()
 
-    # 归一化处理
-    minmax_demo()
+    # 代码7: 归一化处理
+    # minmax_demo()
 
+    # 代码8: 标准化处理
+    # standard_scaler_demo()
+
+    # 代码9: 低方差维度过滤
+    # variance_demo()
+
+    # 代码10: 皮尔逊相关系数
+    # pearsonr_demo()
+
+    # 代码11: pca
+    pca_demo()
 
 
 if __name__ == '__main__':
