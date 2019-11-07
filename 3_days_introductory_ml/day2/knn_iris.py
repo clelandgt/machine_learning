@@ -44,9 +44,8 @@ def knn_iris():
     # 4.KNN算法预估器
     estimator = KNeighborsClassifier()
     estimator.fit(train_data, y_train)
-    print("Predict: \n", estimator.predict(x_train))
+    print("Predict: \n", estimator.predict(train_data))
     print("Target: \n", y_train)
-    print(estimator.predict(x_train))
 
     # 5.模型评估
     print('Train score: \n', estimator.score(train_data, y_train))
