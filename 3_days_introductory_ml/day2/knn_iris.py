@@ -20,6 +20,7 @@ iris数据集时常用分类实验数据集，由Fisher 1936年搜集整理。Ir
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
 
 
 def knn_iris():
@@ -32,16 +33,24 @@ def knn_iris():
 
     # 2.数据集划分
     x_train, x_test, y_train, y_test = train_test_split(iris.data, iris.target)
+    print("Data: \n", x_train)
 
     # 3.特征工程：标准化
     transformer = StandardScaler()
     train_data = transformer.fit_transform(x_train)
     test_data = transformer.fit_transform(x_test)
+    print("Preprocessing: \n", train_data)
 
     # 4.KNN算法预估器
-    # 5.模型评估
+    estimator = KNeighborsClassifier()
+    estimator.fit(train_data, y_train)
+    print("Predict: \n", estimator.predict(x_train))
+    print("Target: \n", y_train)
+    print(estimator.predict(x_train))
 
-    return
+    # 5.模型评估
+    print('Train score: \n', estimator.score(train_data, y_train))
+    print('Test score: \n', estimator.score(test_data, y_test))
 
 
 def main():
