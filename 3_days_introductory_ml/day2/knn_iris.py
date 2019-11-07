@@ -21,6 +21,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import GridSearchCV
 
 
 def knn_iris():
@@ -52,8 +53,50 @@ def knn_iris():
     print('Test score: \n', estimator.score(test_data, y_test))
 
 
+def knn_iris_grid():
+    """
+    使用KNN算法对鸢尾花进行分类. 调优方法使用：网格搜索
+    :return:
+    """
+    # 1.获取数据
+    iris = load_iris()
+
+    # 2.数据集划分
+    x_train, x_test, y_train, y_test = train_test_split(iris.data, iris.target)
+    print("Data: \n", x_train)
+
+    # 3.特征工程：标准化
+    transformer = StandardScaler()
+    train_data = transformer.fit_transform(x_train)
+    test_data = transformer.fit_transform(x_test)
+    print("Preprocessing: \n", train_data)
+
+    # 4.KNN算法预估器
+    estimator = KNeighborsClassifier()
+    param_dict = {'n_neighbors': [1, 3, 5, 7, 9, 11]}
+    estimator = GridSearchCV(estimator, param_grid=param_dict, cv=10)
+    estimator.fit(train_data, y_train)
+
+    # 5.模型评估
+    print('Train score: \n', estimator.score(train_data, y_train))
+    print('Test score: \n', estimator.score(test_data, y_test))
+
+    # 最佳参数
+    print(u'最佳参数: \n', estimator.best_params_)
+    # 最佳结果
+    print(u'结果: \n', estimator.best_score_)
+    # 最佳估计器
+    print(u'估计器: \n', estimator.best_estimator_)
+    # 交叉验证结果
+    print(u'估计器: \n', estimator.cv_results_)
+
+
 def main():
-    knn_iris()
+    # KNN算法对鸢尾花进行分类
+    # knn_iris()
+
+    # KNN算法对鸢尾花进行分类，模型优化
+    knn_iris_grid()
 
 
 if __name__ == '__main__':
