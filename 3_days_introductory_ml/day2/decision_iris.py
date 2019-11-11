@@ -7,6 +7,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import export_graphviz
 
 
 def decision_iris():
@@ -34,6 +35,9 @@ def decision_iris():
     # 方法儿: 计算准确度
     score = estimator.score(x_test, y_test)
     print(u"准确率： \n", score)
+
+    # 可视化决策树
+    export_graphviz(estimator, out_file='iris_tree.dot', feature_names=iris.feature_names)
 
 
 def main():
