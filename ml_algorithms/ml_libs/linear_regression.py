@@ -50,6 +50,7 @@ class LinearRegressionGradientDescentCycle:
 
     def fit(self, x_train, y_train, eta=0.01, epsilon=1e-8, max_iters=1e4):
         """训练"""
+        # 将x转置加上一列全为1
         X_b = np.hstack([np.ones((len(x_train), 1)), x_train.reshape(-1, 1)])
         initial_thetas = np.zeros(X_b.shape[1])
         self.gradient_descent(X_b, y_train, initial_thetas, eta, epsilon, max_iters)
