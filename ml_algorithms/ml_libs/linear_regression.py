@@ -26,6 +26,23 @@ class LinearRegression:
         return 1 - np.dot(y_predict - y, y_predict - y) / len(y) / np.var(y)
 
 
+class LinearRegressionNormal(LinearRegression):
+    """线性回归 """
+    def fit(self, x_train, y_train):
+        # 矩阵第一列填充1
+        X_b = np.hstack([np.ones((len(x_train), 1)), x_train])
+        # np.linalg.inv求逆矩阵
+        self._theta = np.linalg.inv(np.dot(X_b.T, X_b)).dot(X_b.T).dot(y_train)
+        self.intercept = self._theta[0]
+        self.coef = self._theta[1:]
+
+        return self
+
+    def predict(self, x_predict):
+        X_b = np.hstack([np.ones((len(x_predict), 1)), x_predict])
+        return np.dot(X_b, self._theta)
+
+
 class LinearRegressionBGDLoop(LinearRegression):
     """ 批量梯度下降(BGD)_循环维度 """
     def j(self, x, y, theta):
@@ -147,27 +164,35 @@ def main():
     x = np.random.random(size=num_size)
     # 函数 y=10x+5 然后设置一定的随机波动
     y = 10 * x + 5 + np.random.normal(size=num_size)
-    x = x.reshape(-1, 1)
+    X = x.reshape(-1, 1)
+
+    lin_reg = LinearRegressionNormal()
+    lin_reg.fit(X, y)
+    predict_y = lin_reg.predict(X)
+    print('---- Normal ----')
+    print('coefs: ', lin_reg.coefs)
+    print('intercept: ', lin_reg.intercept)
+    print('score: ', lin_reg.score(y, predict_y))
 
     lin_reg = LinearRegressionBGDLoop()
-    lin_reg.fit(x, y)
-    predict_y = lin_reg.predict(x)
+    lin_reg.fit(X, y)
+    predict_y = lin_reg.predict(X)
     print('---- BGD Loop ----')
     print('coefs: ', lin_reg.coefs)
     print('intercept: ', lin_reg.intercept)
     print('score: ', lin_reg.score(y, predict_y))
 
     lin_reg = LinearRegressionBGDVector()
-    lin_reg.fit(x, y)
-    predict_y = lin_reg.predict(x)
+    lin_reg.fit(X, y)
+    predict_y = lin_reg.predict(X)
     print('---- BGD Vector ----')
     print('coefs: ', lin_reg.coefs)
     print('intercept: ', lin_reg.intercept)
     print('score: ', lin_reg.score(y, predict_y))
 
     lin_reg = LinearRegressionSGD()
-    lin_reg.fit(x, y)
-    predict_y = lin_reg.predict(x)
+    lin_reg.fit(X, y)
+    predict_y = lin_reg.predict(X)
     print('---- SGD ----')
     print('coefs: ', lin_reg.coefs)
     print('intercept: ', lin_reg.intercept)
