@@ -36,6 +36,17 @@ class LinearRegressionBGDLoop(LinearRegression):
             # 当数据特别大，报错时，返回无穷大。
             return float('inf')
 
+    def dj_debug(self, x, y, theta, epsilon=0.01):
+        """梯度调试"""
+        res = np.empty(len(theta))
+        for i in range(len(theta)):
+            theta_1 = theta.copy()
+            theta_1[i] += epsilon
+            theta_2 = theta.copy()
+            theta_2[i] -= epsilon
+            res[i] = (self.j(theta_1, x, y) - self.j(theta_2, x, y)) / (2 * epsilon)
+        return res
+
     def dj(self, x, y, thetas):
         """求导(梯度)"""
         res = np.empty(len(thetas))
@@ -46,12 +57,12 @@ class LinearRegressionBGDLoop(LinearRegression):
 
         return res * 2 / len(x)
 
-    def gradient_descent(self, x, y, initial_thetas, eta, epsilon, max_iters):
+    def gradient_descent(self, dj, x, y, initial_thetas, eta, epsilon, max_iters):
         """梯度下降"""
         thetas = initial_thetas
         while max_iters > 0:
             # 梯度gradient
-            gradient = self.dj(x, y, thetas)
+            gradient = dj(x, y, thetas)
             last_thetas = thetas
             thetas = thetas - eta * gradient
             if(abs(self.j(x, y, thetas) - self.j(x, y, last_thetas)) < epsilon):
@@ -62,16 +73,20 @@ class LinearRegressionBGDLoop(LinearRegression):
         self.intercept = thetas[0]
         self.coefs = thetas[1:]
 
-    def fit(self, x_train, y_train, eta=0.01, epsilon=1e-8, max_iters=1e4):
+    def fit(self, x_train, y_train, eta=0.01, epsilon=1e-8, max_iters=1e4, debug=False):
         """训练"""
         # 加上一列全为1
         X_b = np.hstack([np.ones((len(x_train), 1)), x_train])
         initial_thetas = np.zeros(X_b.shape[1])
-        self.gradient_descent(X_b, y_train, initial_thetas, eta, epsilon, max_iters)
+
+        if debug:
+            self.gradient_descent(self.dj_debug, X_b, y_train, initial_thetas, eta, epsilon, max_iters)
+        else:
+            self.gradient_descent(self.dj, X_b, y_train, initial_thetas, eta, epsilon, max_iters)
 
     def predict(self, x_predict):
         """预测"""
-        X_b = np.hstack([np.ones((len(x_predict), 1)), x_predict.reshape(-1, 1)])
+        X_b = np.hstack([np.ones((len(x_predict), 1)), x_predict])
         return np.dot(X_b, self._thetas)
 
     @staticmethod
@@ -92,14 +107,14 @@ class LinearRegressionSGD(LinearRegressionBGDLoop):
     def dj(self, x_i, y_i, thetas):
         return (x_i.T).dot(x_i.dot(thetas)-y_i) * 2
 
-    def gradient_descent(self, x, y, initial_thetas, eta, epsilon, max_iters, t0, t1):
+    def gradient_descent(self, dj, x, y, initial_thetas, eta, epsilon, max_iters, t0, t1):
         """梯度下降"""
         thetas = initial_thetas
         while max_iters > 0:
             # 随机抽取一个样本
             i = np.random.randint(len(x))
             # 梯度gradient
-            gradient = self.dj(x[i], y[i], thetas)
+            gradient = dj(x[i], y[i], thetas)
             last_thetas = thetas
             # 学习率模拟退火
             eta = (t0 + eta) / (max_iters + t1)
@@ -112,16 +127,19 @@ class LinearRegressionSGD(LinearRegressionBGDLoop):
         self.intercept = thetas[0]
         self.coefs = thetas[1:]
 
-    def fit(self, x_train, y_train, eta=0.01, epsilon=1e-8, max_iters=1e4, t0=5, t1=50):
+    def fit(self, x_train, y_train, eta=0.01, epsilon=1e-8, max_iters=1e4, t0=5, t1=50, debug=False):
         """训练"""
         # 加上一列全为1
         X_b = np.hstack([np.ones((len(x_train), 1)), x_train])
         initial_thetas = np.zeros(X_b.shape[1])
-        self.gradient_descent(X_b, y_train, initial_thetas, eta, epsilon, max_iters, t0, t1)
+
+        if debug:
+            self.gradient_descent(self.dj_debug, X_b, y_train, initial_thetas, eta, epsilon, max_iters, t0, t1)
+        else:
+            self.gradient_descent(self.dj, X_b, y_train, initial_thetas, eta, epsilon, max_iters, t0, t1)
 
 
 def main():
-
     # 1. 初始化数据
     num_size = 2000
     np.random.seed(100)
